@@ -17,6 +17,8 @@
 %
 % This example is hard-coded to depend on having a GPU.
 
+clear;clc;close all
+
 %% To translate Guerrieri & Lorenzoni (2017) into the standard setup of VFI Toolkit I use following:
 % d variables: n_it
 % aprime variables: b_it+1
