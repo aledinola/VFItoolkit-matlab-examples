@@ -1,9 +1,15 @@
-Algorithm    = 1 (fminsearch)
+Algorithm    = 0 
  p_eqm        = 0.038969 
  GE residual  = 0.000009 
- Running time = 4.422830
+ Running time = 4.496899 
+ Calculating various equilibrium objects 
  
- Algorithm    = 7 (fsolve)
+ Algorithm    = 1 
  p_eqm        = 0.038969 
  GE residual  = 0.000009 
- Running time = 3.373976 
+ Running time = 3.976290 
+ 
+ Algorithm    = 7 
+ p_eqm        = 0.038969 
+ GE residual  = 0.000009 
+ Running time = 4.675503 

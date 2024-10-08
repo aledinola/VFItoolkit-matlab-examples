@@ -102,16 +102,34 @@ Params.r=0.038;
 vfoptions=struct(); % Use default options for solving the value function (and policy fn)
 simoptions=struct(); % Use default options for solving for stationary distribution
 heteroagentoptions.verbose=1; % verbose means that you want it to give you feedback on what is going on
+heteroagentoptions.toleranceGEprices = 1e-6;
 
 % Algorithm to find GE
 %  0: fzero (only if one GE variable)
 %  1: fminsearch
 %  7: fsolve
-heteroagentoptions.fminalgo=7;  
+% TODO it gets changed to fminalgo=1 
+heteroagentoptions.fminalgo=0;  
 fprintf('Calculating price vector corresponding to the stationary general eqm \n')
 tic
 [p_eqm,~,GeneralEqmCondn]=HeteroAgentStationaryEqm_Case1(n_d, n_a, n_z, 0, pi_z, d_grid, a_grid, z_grid, ReturnFn, FnsToEvaluate, GeneralEqmEqns, Params, DiscountFactorParamNames, [], [], [], GEPriceParamNames,heteroagentoptions, simoptions, vfoptions);
 ge_time=toc;
+
+fprintf('Algorithm    = %d \n ',heteroagentoptions.fminalgo)
+fprintf('p_eqm        = %f \n ',p_eqm.r)
+fprintf('GE residual  = %f \n ',GeneralEqmCondn.CapitalMarket)
+fprintf('Running time = %f \n ',ge_time)
+
+x_init = [0.036,0.04];
+heteroagentoptions.fminalgo=0;
+%CapitalMarket_res = fun_GE(mean(x_init),Params,n_d,n_a,n_z,d_grid,a_grid,z_grid, pi_z, ReturnFn,DiscountFactorParamNames,vfoptions,simoptions,FnsToEvaluate);
+tic
+[x_opt,fval] = fzero(@(x) fun_GE(x,Params,n_d,n_a,n_z,d_grid,a_grid,z_grid, pi_z, ReturnFn,DiscountFactorParamNames,vfoptions,simoptions,FnsToEvaluate), x_init);
+ge_time=toc;
+
+p_eqm.r = x_opt;
+GeneralEqmCondn.CapitalMarket=fval;
+
 % The equilibrium values of the GE prices
 fprintf('Algorithm    = %d \n ',heteroagentoptions.fminalgo)
 fprintf('p_eqm        = %f \n ',p_eqm.r)
