@@ -9,6 +9,8 @@
 % sets defaults accordingly. It will run without a GPU, but slowly. It is
 % indended for use with GPU.
 
+clear,clc,close all, format long g
+
 %% Set some basic variables
 
 % VFI Toolkit thinks of there as being:
@@ -16,8 +18,8 @@
 % z: an exogenous state variable (exogenous labor supply)
 
 % Size of the grids
-n_k=2^9;%2^9;
-n_z=11; %21;
+n_k = 512;
+n_z = 11;
 
 % Parameters
 Params.beta=0.96; %Model period is one-sixth of a year
@@ -51,7 +53,12 @@ r_ss=1/Params.beta-1;
 K_ss=((r_ss+Params.delta)/Params.alpha)^(1/(Params.alpha-1)); %The steady state capital in the absence of aggregate uncertainty.
 
 % Set grid for asset holdings
-k_grid=10*K_ss*(linspace(0,1,n_k).^3)'; % linspace ^3 puts more points near zero, where the curvature of value and policy functions is higher and where model spends more time
+k_min = 0;
+k_max = 10*K_ss;
+k_scale = 3;
+% If k_scale=1, equally spaced grid. If k_scale>1, more points near zero, 
+% where the curvature of value and policy functions is higher
+k_grid=k_min+(k_max-k_min)*(linspace(0,1,n_k).^k_scale)'; 
 
 % Bring model into the notational conventions used by the toolkit
 d_grid=0; %There is no d variable
@@ -96,10 +103,21 @@ vfoptions=struct(); % Use default options for solving the value function (and po
 simoptions=struct(); % Use default options for solving for stationary distribution
 heteroagentoptions.verbose=1; % verbose means that you want it to give you feedback on what is going on
 
+% Algorithm to find GE
+%  0: fzero (only if one GE variable)
+%  1: fminsearch
+%  7: fsolve
+heteroagentoptions.fminalgo=7;  
 fprintf('Calculating price vector corresponding to the stationary general eqm \n')
+tic
 [p_eqm,~,GeneralEqmCondn]=HeteroAgentStationaryEqm_Case1(n_d, n_a, n_z, 0, pi_z, d_grid, a_grid, z_grid, ReturnFn, FnsToEvaluate, GeneralEqmEqns, Params, DiscountFactorParamNames, [], [], [], GEPriceParamNames,heteroagentoptions, simoptions, vfoptions);
+ge_time=toc;
+% The equilibrium values of the GE prices
+fprintf('Algorithm    = %d \n ',heteroagentoptions.fminalgo)
+fprintf('p_eqm        = %f \n ',p_eqm.r)
+fprintf('GE residual  = %f \n ',GeneralEqmCondn.CapitalMarket)
+fprintf('Running time = %f \n ',ge_time)
 
-p_eqm % The equilibrium values of the GE prices
 
 %% Now that we have the GE, let's calculate a bunch of related objects
 Params.r=p_eqm.r; % Put the equilibrium interest rate into Params so we can use it to calculate things based on equilibrium parameters

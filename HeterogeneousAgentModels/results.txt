@@ -1,0 +1,9 @@
+Algorithm    = 1 (fminsearch)
+ p_eqm        = 0.038969 
+ GE residual  = 0.000009 
+ Running time = 4.422830
+ 
+ Algorithm    = 7 (fsolve)
+ p_eqm        = 0.038969 
+ GE residual  = 0.000009 
+ Running time = 3.373976 
